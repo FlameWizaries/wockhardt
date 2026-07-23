@@ -1,0 +1,2373 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0 user-scalable=no"/>
+        <title>THE WOCKHARDT MANDEM</title>
+        <link rel="shortcut icon" href="./img/twmm.png" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+        <link rel="stylesheet" href="./css/style.css" />
+        <link rel="stylesheet" href="./css/plyr-premium.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@200..800&family=Oswald:wght@200..700&family=Russo+One&family=Unbounded:wght@200..900&display=swap" rel="stylesheet">
+    </head>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <body>
+        <!-- Индикатор загрузки -->
+        <div
+            id="loadingIndicator"
+            style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--bg);
+                z-index: 99999;
+                flex-direction: column;
+                gap: 16px;
+                transition: opacity 0.5s ease;
+            "
+        >
+            <div
+                style="
+                    width: 48px;
+                    height: 48px;
+                    border: 4px solid var(--border);
+                    border-top-color: var(--purple);
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
+                "
+            ></div>
+            <span
+                style="
+                    color: var(--gray);
+                    font-family: &quot;Manrope&quot;, sans-serif;
+                    font-size: 16px;
+                    font-weight: 500;
+                    letter-spacing: 1px;
+                "
+                >Загрузка</span
+            >
+        </div>
+
+        <style>
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+        <!-- Toast уведомления -->
+        <div id="toastContainer"></div>
+
+        <!-- Кнопка "Наверх" -->
+        <button id="scrollTopBtn" title="Наверх">↑</button>
+
+        <!-- Авторизация -->
+        <div id="authPage" class="auth-page">
+            <div class="auth-container">
+                <div class="auth-box">
+                    <button
+                        class="theme-toggle-btn auth-theme-toggle"
+                        id="authThemeToggle"
+                        title="Сменить тему"
+                    >
+                        🌙
+                    </button>
+
+                    <div class="auth-logo">
+                        <img
+                            src="./img/banner-logo.png"
+                            alt="Logo"
+                            class="auth-logo-img"
+                        />
+                    </div>
+                    <h1 class="auth-title">THE WOCKHARDT MANDEM</h1>
+                    <div class="auth-subtitles">
+                        <p class="auth-subtitleX">X</p>
+                        <p class="auth-amazing">AMAZING ONLINE</p>
+                    </div>
+                    
+
+                    <form id="authForm" class="auth-form">
+                        <div id="authError" class="auth-error"></div>
+
+                        <div class="auth-field">
+                            <input
+                                type="email"
+                                id="authEmail"
+                                placeholder="Email"
+                                required
+                            />
+                        </div>
+                        <div
+                            class="auth-field"
+                            id="usernameField"
+                            style="display: none"
+                        >
+                            <input
+                                type="text"
+                                id="authUsername"
+                                placeholder="Игровой ник"
+                            />
+                        </div>
+                        <div class="auth-field">
+                            <input
+                                type="password"
+                                id="authPassword"
+                                placeholder="Пароль"
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="auth-btn"
+                            id="authSubmitBtn"
+                        >
+                            LOGIN
+                        </button>
+
+                        <div class="auth-links">
+                            <span id="authToggle"
+                                >Нет аккаунта?
+                                <a href="#">Зарегистрироваться</a></span
+                            >
+                            <br />
+                            <span
+                                id="forgotPassword"
+                            >
+                                Забыли пароль?
+                            </span>
+                        </div>
+                    </form>
+
+                    <p class="auth-footer">
+                        Только для авторизованных участников
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== МОДАЛЬНОЕ ОКНО ВОССТАНОВЛЕНИЯ ПАРОЛЯ ====== -->
+        <div class="modal-overlay" id="resetPasswordModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Восстановление пароля</h2>
+                    <button class="modal-close" id="resetModalClose">✕</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: var(--gray); margin-bottom: 20px;">Введите email, на который будет отправлена ссылка для восстановления пароля.</p>
+                    <form id="resetPasswordForm">
+                        <div class="form-group">
+                            <label for="resetEmail">📧 Email</label>
+                            <input type="email" id="resetEmail" class="form-input" placeholder="Ваш email" required>
+                        </div>
+                        <div id="resetMessage" style="text-align: center; margin: 10px 0; font-size: 14px; min-height: 24px;"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-cancel" id="resetModalCancel">Cancel</button>
+                            <button type="submit" class="btn-submit" id="resetSubmitBtn">📤 Send a link</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ОТЧЕТА ====== -->
+        <div class="modal-overlay" id="editReportModal" style="display: none;">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2>✏️ Редактировать отчет</h2>
+                    <button class="modal-close" id="editReportModalClose">✕</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editReportForm">
+                        <div class="form-group">
+                            <label for="editReportDate">📅 DATE</label>
+                            <input type="date" id="editReportDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editReportEvent">🎯 EVENT</label>
+                            <select id="editReportEvent" class="form-input" required>
+                                <option value="">Выберите событие...</option>
+                                    <option value="ФАМКАПТ">ФАМКАПТ</option>
+                                    <option value="РЕЙД">РЕЙД</option>
+                                    <option value="ФАМВАР">ФАМВАР</option>
+                                    <option value="ФАМБИЗВАР">ФАМБИЗВАР</option>
+                                    <option value="КОРАБЛЬ">КОРАБЛЬ</option>
+                                    <option value="КЛАДЫ">КЛАДЫ</option>
+                                    <option value="ЦЕХ">ЦЕХ</option>
+                                    <option value="ГРАФФИТИ">ГРАФФИТИ</option>
+                                    <option value="КОНТЕЙНЕРЫ">КОНТЕЙНЕРЫ</option>
+                                    <option value="ЗАБИВ КАПТА">ЗАБИВ КАПТА</option>
+                                    <option value="КАПТ">КАПТ</option>
+                                    <option value="СУМКА С ПОЕЗДА">СУМКА С ПОЕЗДА</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editReportTimeStart">⏰ TIME START</label>
+                            <input type="time" id="editReportTimeStart" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editReportTimeEnd">⏰ TIME END</label>
+                            <input type="time" id="editReportTimeEnd" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editReportDescription">📝 DESCRIPTION</label>
+                            <input type="text" id="editReportDescription" class="form-input" placeholder="Дополнительная информация...">
+                        </div>
+                        <div id="editReportError" style="color: var(--red); text-align: center; margin: 10px 0; display: none;"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-cancel" id="editReportModalCancel">CANCEL</button>
+                            <button type="submit" class="btn-submit" id="editReportSubmitBtn">💾 SAVE</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== МОДАЛЬНОЕ ОКНО УДАЛЕНИЯ ОТЧЕТА С ПРИЧИНОЙ ====== -->
+        <div class="modal-overlay" id="deleteReportModal" style="display: none;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2>🗑 Удаление отчета</h2>
+                    <button class="modal-close" id="deleteReportModalClose">✕</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color: var(--gray); margin-bottom: 16px;">
+                        Вы действительно хотите удалить этот отчет? Укажите причину удаления.
+                    </p>
+                    <form id="deleteReportForm">
+                        <div class="form-group">
+                            <label for="deleteReportReason" class="deleteReportReason">📝 Причина удаления</label>
+                            <textarea 
+                                id="deleteReportReason" 
+                                class="form-input" 
+                                rows="3" 
+                                placeholder="Укажите причину удаления отчета..."
+                                required
+                            ></textarea>
+                        </div>
+                        <div id="deleteReportError" style="color: var(--red); text-align: center; margin: 10px 0; display: none;"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-cancel" id="deleteReportCancel">CANCEL</button>
+                            <button type="submit" class="btn-submit" id="deleteReportSubmitBtn" style="background: var(--red);">🗑 DELETE</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основное приложение -->
+        <div id="appPage" class="app-page" style="display: block">
+            <!-- ====== САЙДБАР ====== -->
+            <div class="sidebar" id="sidebar">
+                <button class="sidebar-close" id="sidebarClose">✕</button>
+                <div class="sidebar-content">
+                    <div class="sidebar-logo">
+                        <img
+                            src="./img/twmm.png"
+                            alt="Logo"
+                            style="max-width: 100px"
+                        />
+                    </div>
+                    <div class="sidebar-user">
+                        <span id="sidebarUsername">Пользователь</span>
+                        <span id="sidebarRole">Участник</span>
+                    </div>
+
+                    <!-- НАВИГАЦИЯ В САЙДБАРЕ -->
+                    <nav class="sidebar-nav">
+                        <!-- ГРУППА: ОСНОВНОЕ -->
+                        <div class="sidebar-nav-group">
+                            <div class="sidebar-nav-label">📌 Основное</div>
+                            <button class="sidebar-nav-btn active" data-tab="dashboard">📊 Главная</button>
+                            <button class="sidebar-nav-btn" data-tab="reports">📋 Отчеты</button>
+                            <button class="sidebar-nav-btn" data-tab="salary">💰 Зарплата</button>
+                            <button class="sidebar-nav-btn" data-tab="notifications">
+                                🔔 Уведомления
+                                <span class="notification-badge hidden" id="notificationBadge">0</span>
+                            </button>
+                        </div>  
+
+                        <!-- ГРУППА: АКАДЕМИЯ -->
+                        <div class="sidebar-nav-group">
+                            <div class="sidebar-nav-label">🎓 Академия</div>
+                            <button class="sidebar-nav-btn" data-tab="academy">
+                                📖 Обучение
+                            </button>
+                        </div>
+                    </nav>
+
+                    <button class="sidebar-logout" id="sidebarLogoutBtn">
+                        Выйти
+                    </button>
+                    <hr style="border-color: var(--border); margin: 15px 0" />
+                    <div class="sidebar-stats">
+                        <div class="sidebar-stat">
+                            <span
+                                class="sidebar-stat-number"
+                                id="sidebarTotalReports"
+                                >0</span
+                            >
+                            <span class="sidebar-stat-label">Отчетов</span>
+                        </div>
+                        <div class="sidebar-stat">
+                            <span
+                                class="sidebar-stat-number"
+                                id="sidebarPendingApproval"
+                                >0</span
+                            >
+                            <span class="sidebar-stat-label">Ожидают</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <header class="header">
+                <div class="container">
+                    <div class="header-row">
+                        <div class="header-left">
+                            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                                ☰
+                            </button>
+                        </div>
+                        <div class="header-user">
+                            <button
+                                class="theme-toggle-btn"
+                                id="themeToggle"
+                                title="Сменить тему"
+                            >
+                                🌙
+                            </button>
+                            <span class="header-username" id="headerUsername"
+                                >Пользователь</span
+                            >
+                            <span class="header-role" id="headerRole"
+                                >Участник</span
+                            >
+                            <button class="header-logout" id="logoutBtn">
+                                Выйти
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="main">
+                <!-- ============================================================ -->
+                <!-- ВКЛАДКА: ГЛАВНАЯ -->
+                <!-- ============================================================ -->
+                <section class="tab-content active" id="tab-dashboard">
+                    <div class="container">
+                        <!-- ====== ЛОГОТИП СЕМЬИ ====== -->
+                        <section class="section-family-brand">
+                            <div class="family-brand">
+                                <div class="brand-glow"></div>
+                                <h1 class="brand-title">
+                                    THE WOCKHARDT MANDEM
+                                </h1>
+                                <div class="brand-divider">
+                                    <span>✦</span>
+                                    <span>✦</span>
+                                    <span>✦</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="section-stats">
+                            <div class="stats-grid" id="statsGrid">
+                                <div class="stat-card">
+                                    <div class="stat-icon">📊</div>
+                                    <span class="stat-number" id="totalReports"
+                                        >0</span
+                                    >
+                                    <span class="stat-label"
+                                        >Всего отчетов</span
+                                    >
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon">🖼️</div>
+                                    <span class="stat-number" id="totalImages"
+                                        >0</span
+                                    >
+                                    <span class="stat-label">Скриншотов</span>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon">🎯</div>
+                                    <span class="stat-number" id="uniqueEvents"
+                                        >0</span
+                                    >
+                                    <span class="stat-label"
+                                        >Уникальных событий</span
+                                    >
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon">⏳</div>
+                                    <span
+                                        class="stat-number"
+                                        id="pendingApproval"
+                                        >0</span
+                                    >
+                                    <span class="stat-label"
+                                        >Ожидают утверждения</span
+                                    >
+                                </div>
+                            </div>
+
+                            <div
+                                class="approval-progress"
+                                id="approvalProgress"
+                            >
+                                <div
+                                    class="progress-bar"
+                                    id="progressBar"
+                                    style="width: 0%"
+                                ></div>
+                                <span class="progress-text" id="progressText"
+                                    >0 из 0 утверждены</span
+                                >
+                            </div>
+
+                            <!-- ====== СТАТИСТИКА СЕМЬИ ====== -->
+                            <section class="section-family-stats">
+                                <div class="family-stats-grid">
+                                    <div class="family-stat-card">
+                                        <div class="family-stat-icon">👥</div>
+                                        <div>
+                                            <span
+                                                class="family-stat-number"
+                                                id="familyMembers"
+                                                >0</span
+                                            >
+                                            <span class="family-stat-label"
+                                                >Участников</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="family-stat-card">
+                                        <div class="family-stat-icon">📈</div>
+                                        <div>
+                                            <span
+                                                class="family-stat-number"
+                                                id="weeklyReports"
+                                                >0</span
+                                            >
+                                            <span class="family-stat-label"
+                                                >Отчетов за неделю</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="family-stat-card">
+                                        <div class="family-stat-icon">💰</div>
+                                        <div>
+                                            <span
+                                                class="family-stat-number"
+                                                id="totalEarned"
+                                                >0 Ꝑ</span
+                                            >
+                                            <span class="family-stat-label"
+                                                >Всего заработано</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- ====== БЫСТРЫЕ ДЕЙСТВИЯ ====== -->
+                            <section class="section-quick-actions">
+                                <h2 class="section-title">
+                                    🚀 Быстрые действия
+                                </h2>
+                                <div class="quick-actions-grid">
+                                    <div
+                                        class="quick-action"
+                                        onclick="
+                                            window.switchTab &&
+                                                window.switchTab('reports')
+                                        "
+                                    >
+                                        <div class="quick-action-icon">📋</div>
+                                        <span>Создать отчет</span>
+                                    </div>
+                                    <div
+                                        class="quick-action"
+                                        onclick="
+                                            window.switchTab &&
+                                                window.switchTab('salary')
+                                        "
+                                    >
+                                        <div class="quick-action-icon">💰</div>
+                                        <span>Моя зарплата</span>
+                                    </div>
+                                    <div
+                                        class="quick-action"
+                                        onclick="
+                                            window.switchTab &&
+                                                window.switchTab('academy')
+                                        "
+                                    >
+                                        <div class="quick-action-icon">📖</div>
+                                        <span>Обучение</span>
+                                    </div>
+                                    <div
+                                        class="quick-action"
+                                        onclick="location.reload()"
+                                    >
+                                        <div class="quick-action-icon">🔄</div>
+                                        <span>Обновить</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- ====== АКТИВНОСТЬ ЗА НЕДЕЛЮ ====== -->
+                            <section class="section-week-activity">
+                                <h2 class="section-title">
+                                    📊 Активность за неделю
+                                </h2>
+                                <div class="week-activity" id="weekActivity">
+                                    <div class="day-bar" data-day="Пн">
+                                        <span
+                                            class="bar"
+                                            style="height: 0%"
+                                        ></span>
+                                        <span class="day-label">Пн</span>
+                                    </div>
+                                    <div class="day-bar" data-day="Вт">
+                                        <span
+                                            class="bar"
+                                            style="height: 0%"
+                                        ></span>
+                                        <span class="day-label">Вт</span>
+                                    </div>
+                                    <div class="day-bar" data-day="Ср">
+                                        <span
+                                            class="bar"
+                                            style="height: 0%"
+                                        ></span>
+                                        <span class="day-label">Ср</span>
+                                    </div>
+                                    <div class="day-bar" data-day="Чт">
+                                        <span
+                                            class="bar"
+                                            style="height: 0%"
+                                        ></span>
+                                        <span class="day-label">Чт</span>
+                                    </div>
+                                    <div class="day-bar" data-day="Пт">
+                                        <span
+                                            class="bar"
+                                            style="height: 0%"
+                                        ></span>
+                                        <span class="day-label">Пт</span>
+                                    </div>
+                                    <div class="day-bar" data-day="Сб">
+                                        <span
+                                            class="bar"
+                                            style="height: 0%"
+                                        ></span>
+                                        <span class="day-label">Сб</span>
+                                    </div>
+                                    <div class="day-bar" data-day="Вс">
+                                        <span
+                                            class="bar"
+                                            style="height: 0%"
+                                        ></span>
+                                        <span class="day-label">Вс</span>
+                                    </div>
+                                </div>
+                            </section>
+                        </section>
+                    </div>
+                </section>
+
+                <!-- ============================================================ -->
+                <!-- ВКЛАДКА: ОТЧЕТЫ -->
+                <!-- ============================================================ -->
+                <section class="tab-content" id="tab-reports" style="display: none;">
+                    <div class="container">
+                        
+                        <!-- ====== ИНСТРУКЦИЯ ПО ОФОРМЛЕНИЮ ОТЧЕТОВ ====== -->
+                        <div class="reports-guide">
+                            <div class="reports-guide-header" onclick="toggleReportsGuide()">
+                                <div class="reports-guide-icon">📋</div>
+                                <div>
+                                    <h3>Как правильно оформлять отчеты</h3>
+                                    <p>Следуйте инструкции, чтобы ваш отчет был принят и утвержден</p>
+                                </div>
+                                <button class="reports-guide-toggle">
+                                    <span id="reportsGuideArrow">▼</span>
+                                </button>
+                            </div>
+                            <div class="reports-guide-content" id="reportsGuideContent">
+                                <div class="guide-grid">
+                                    <div class="guide-item">
+                                        <span class="guide-icon">📅</span>
+                                        <div>
+                                            <h4>Дата события</h4>
+                                            <p>Указывайте <strong>реальную дату</strong> проведения мероприятия.</p>
+                                        </div>
+                                    </div>
+                                    <div class="guide-item">
+                                        <span class="guide-icon">🎯</span>
+                                        <div>
+                                            <h4>Выбор события</h4>
+                                            <p>Выбирайте <strong>точное название</strong> мероприятия из списка.</p>
+                                        </div>
+                                    </div>
+                                    <div class="guide-item">
+                                        <span class="guide-icon">⏰</span>
+                                        <div>
+                                            <h4>Время проведения</h4>
+                                            <p>Указывайте <strong>время начала и окончания</strong> мероприятия.</p>
+                                        </div>
+                                    </div>
+                                    <div class="guide-item">
+                                        <span class="guide-icon">🖼️</span>
+                                        <div>
+                                            <h4>Скриншоты</h4>
+                                            <p>Обязательно прикрепляйте <strong>подтверждающие скриншоты (НАЧАЛО И КОНЕЦ МП НЕ ЗАБЫВАЙТЕ!)</strong>.</p>
+                                        </div>
+                                    </div>
+                                    <div class="guide-item">
+                                        <span class="guide-icon">✅</span>
+                                        <div>
+                                            <h4>Проверка перед отправкой</h4>
+                                            <p>Проверьте все поля перед отправкой отчета.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ====== ФОРМА ДОБАВЛЕНИЯ ОТЧЕТА ====== -->
+                        <section class="section-add-report">
+                            <div class="add-report-form">
+                                <h2 class="form-title">📋 ДОБАВИТЬ ОТЧЕТ</h2>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="reportDate">📅 DATE</label>
+                                        <input type="date" id="reportDate" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="reportEvent">🎯 EVENT</label>
+                                        <select id="reportEvent" class="form-input">
+                                            <option value="">Выберите событие...</option>
+                                            <option value="ФАМКАПТ">ФАМКАПТ</option>
+                                            <option value="РЕЙД">РЕЙД</option>
+                                            <option value="ФАМВАР">ФАМВАР</option>
+                                            <option value="ФАМБИЗВАР">ФАМБИЗВАР</option>
+                                            <option value="КОРАБЛЬ">КОРАБЛЬ</option>
+                                            <option value="КЛАДЫ">КЛАДЫ</option>
+                                            <option value="ЦЕХ">ЦЕХ</option>
+                                            <option value="ГРАФФИТИ">ГРАФФИТИ</option>
+                                            <option value="КОНТЕЙНЕРЫ">КОНТЕЙНЕРЫ</option>
+                                            <option value="ЗАБИВ КАПТА">ЗАБИВ КАПТА</option>
+                                            <option value="КАПТ">КАПТ</option>
+                                            <option value="СУМКА С ПОЕЗДА">СУМКА С ПОЕЗДА</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="reportTimeStart">⏰ TIME START</label>
+                                        <input type="time" id="reportTimeStart" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="reportTimeEnd">⏰ TIME END</label>
+                                        <input type="time" id="reportTimeEnd" class="form-input">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="reportDescription">📝 DESCRIPTION</label>
+                                        <input type="text" id="reportDescription" class="form-input" placeholder="Дополнительная информация...">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group full-width">
+                                        <label for="reportImages">🖼 SCREENSHOT</label>
+                                        <input type="file" id="reportImages" class="form-input" multiple accept="image/*">
+                                        <div class="file-preview" id="filePreview"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-buttons">
+                                    <button class="btn-submit" id="addReportBtn">➕ Add a report</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- ====== БЫСТРЫЕ ФИЛЬТРЫ ====== -->
+                        <section class="section-quick-filters">
+                            <div class="quick-filters">
+                                <button class="chip active" data-filter="all">📋 Все</button>
+                                <button class="chip" data-filter="ФАМКАПТ">🏰 ФАМКАПТ</button>
+                                <button class="chip" data-filter="РЕЙД">⚔️ РЕЙД</button>
+                                <button class="chip" data-filter="ФАМВАР">⚔️ ФАМВАР</button>
+                                <button class="chip" data-filter="ФАМБИЗВАР">💼 ФАМБИЗВАР</button>
+                                <button class="chip" data-filter="КОРАБЛЬ">🚢 КОРАБЛЬ</button>
+                                <button class="chip" data-filter="КЛАДЫ">💰 КЛАДЫ</button>
+                                <button class="chip" data-filter="ЦЕХ">🏭 ЦЕХ</button>
+                                <button class="chip" data-filter="ГРАФФИТИ">🎨 ГРАФФИТИ</button>
+                                <button class="chip" data-filter="КОНТЕЙНЕРЫ">📦 КОНТЕЙНЕРЫ</button>
+                                <button class="chip" data-filter="ЗАБИВ КАПТА">🏰 ЗАБИВ КАПТА</button>
+                                <button class="chip" data-filter="КАПТ">🏰 КАПТ</button>
+                                <button class="chip" data-filter="СУМКА С ПОЕЗДА">🚂 СУМКА С ПОЕЗДА</button>
+                                <button class="chip" data-filter="pending">⏳ Ожидают</button>
+                                <button class="chip" data-filter="approved">✅ Утверждены</button>
+                                
+                            </div>
+                        </section>
+
+                        <!-- ====== РАСШИРЕННЫЕ ФИЛЬТРЫ ====== -->
+                        <section class="section-filters">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label>Фильтр по дате:</label>
+                                    <input type="date" id="filterDateStart" class="form-input filter-input">
+                                    <span class="filter-sep">—</span>
+                                    <input type="date" id="filterDateEnd" class="form-input filter-input">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Фильтр по событию:</label>
+                                    <select id="filterEvent" class="form-input filter-input">
+                                        <option value="">Все события</option>
+                                        <option value="ФАМКАПТ">ФАМКАПТ</option>
+                                        <option value="РЕЙД">РЕЙД</option>
+                                        <option value="ФАМВАР">ФАМВАР</option>
+                                        <option value="ФАМБИЗВАР">ФАМБИЗВАР</option>
+                                        <option value="КОРАБЛЬ">КОРАБЛЬ</option>
+                                        <option value="КЛАДЫ">КЛАДЫ</option>
+                                        <option value="ЦЕХ">ЦЕХ</option>
+                                        <option value="ГРАФФИТИ">ГРАФФИТИ</option>
+                                        <option value="КОНТЕЙНЕРЫ">КОНТЕЙНЕРЫ</option>
+                                        <option value="ЗАБИВ КАПТА">ЗАБИВ КАПТА</option>
+                                        <option value="КАПТ">КАПТ</option>
+                                        <option value="СУМКА С ПОЕЗДА">СУМКА С ПОЕЗДА</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Статус:</label>
+                                    <select id="filterStatus" class="form-input filter-input">
+                                        <option value="">Все</option>
+                                        <option value="pending">Ожидают</option>
+                                        <option value="approved">Утверждены</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group" id="filterMemberGroup" style="display:none;">
+                                    <label>Участник:</label>
+                                    <select id="filterMember" class="form-input filter-input">
+                                        <option value="">👥 Все участники</option>
+                                    </select>
+                                </div>
+                                <button class="btn-submit btn-reset" id="resetFiltersBtn">↺ Reset</button>
+                                <button class="btn-submit btn-refresh" id="refreshUsersBtn" style="display:none;">🔄 Update list</button>
+                            </div>
+                        </section>
+
+                        <!-- ====== СПИСОК ОТЧЕТОВ ====== -->
+                        <section class="section-report">
+                            <div class="report-header">
+                                <p class="report-date" id="currentReportDate">ОТЧЕТЫ</p>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <span class="report-count" id="reportCount">0 отчетов</span>
+                                </div>
+                            </div>
+
+                            <!-- ====== СТАТИСТИКА ПО ИГРОКАМ (ТОЛЬКО ДЛЯ ЛИДЕРА) ====== -->
+                            <div id="playersStatsContainer" style="display: none; margin-bottom: 20px;">
+                                <div class="players-stats-header">
+                                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                        <h3>👥 Статистика игроков</h3>
+                                        <span class="players-stats-count" id="playersStatsCount">0 игроков</span>
+                                    </div>
+                                    <button class="btn-toggle-stats" id="toggleStatsBtn" style="background: none; border: 1px solid var(--border); color: var(--gray); padding: 4px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: 0.3s;">
+                                        ▲ Скрыть
+                                    </button>
+                                </div>
+                                <div class="players-stats-grid" id="playersStatsGrid">
+                                    <!-- Карточки игроков будут добавляться сюда -->
+                                </div>
+                            </div>
+
+                            <div id="reportsList">
+                                <div class="skeleton-container" id="skeletonContainer">
+                                    <div class="skeleton-report">
+                                        <div class="skeleton-text" style="width: 40%;"></div>
+                                        <div class="skeleton-text" style="width: 60%;"></div>
+                                        <div class="skeleton-text" style="width: 30%;"></div>
+                                        <div class="skeleton-image"></div>
+                                    </div>
+                                    <div class="skeleton-report">
+                                        <div class="skeleton-text" style="width: 40%;"></div>
+                                        <div class="skeleton-text" style="width: 60%;"></div>
+                                        <div class="skeleton-text" style="width: 30%;"></div>
+                                        <div class="skeleton-image"></div>
+                                    </div>
+                                    <div class="skeleton-report">
+                                        <div class="skeleton-text" style="width: 40%;"></div>
+                                        <div class="skeleton-text" style="width: 60%;"></div>
+                                        <div class="skeleton-text" style="width: 30%;"></div>
+                                        <div class="skeleton-image"></div>
+                                    </div>
+                                </div>
+                                <div id="reportsContent" style="display: none;"></div>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+
+                <!-- ============================================================ -->
+                <!-- ВКЛАДКА: ЗАРПЛАТА -->
+                <!-- ============================================================ -->
+                <section
+                    class="tab-content"
+                    id="tab-salary"
+                    style="display: none"
+                >
+                    <div class="container">
+                        <div class="salary-container">
+                            <!-- Блок для ЛИДЕРА (видит только лидер) -->
+                            <div id="salaryLeaderPanel">
+                                <!-- Настройка цен -->
+                                <div class="salary-settings">
+                                    <h3>⚙️ Настройка цен за события</h3>
+                                    <div id="eventPrices">
+                                        <div class="price-row">
+                                            <span>ФАМКАПТ</span>
+                                            <input type="number" id="price_ФАМКАПТ" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>РЕЙД</span>
+                                            <input type="number" id="price_РЕЙД" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>ФАМВАР</span>
+                                            <input type="number" id="price_ФАМВАР" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>ФАМБИЗВАР</span>
+                                            <input type="number" id="price_ФАМБИЗВАР" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>КОРАБЛЬ</span>
+                                            <input type="number" id="price_КОРАБЛЬ" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>КЛАДЫ</span>
+                                            <input type="number" id="price_КЛАДЫ" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>ЦЕХ</span>
+                                            <input type="number" id="price_ЦЕХ" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>ГРАФФИТИ</span>
+                                            <input type="number" id="price_ГРАФФИТИ" class="price-input" placeholder="0">
+                                        </div>
+                                        <!-- ====== НОВЫЕ СОБЫТИЯ ====== -->
+                                        <div class="price-row">
+                                            <span>КОНТЕЙНЕРЫ</span>
+                                            <input type="number" id="price_КОНТЕЙНЕРЫ" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>ЗАБИВ КАПТА</span>
+                                            <input type="number" id="price_ЗАБИВ КАПТА" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>КАПТ</span>
+                                            <input type="number" id="price_КАПТ" class="price-input" placeholder="0">
+                                        </div>
+                                        <div class="price-row">
+                                            <span>СУМКА С ПОЕЗДА</span>
+                                            <input type="number" id="price_СУМКА С ПОЕЗДА" class="price-input" placeholder="0">
+                                        </div>
+                                    </div>
+                                    <div class="buttons">
+                                        <button
+                                            class="btn-submit btn-save-prices"
+                                            id="savePricesBtn"
+                                        >
+                                            💾 Save price
+                                        </button>
+                                        <button
+                                            class="btn-submit btn-reset-prices"
+                                            id="resetPricesBtn"
+                                            style="
+                                                background: var(--red);
+                                            "
+                                        >
+                                            🔄 Reset
+                                        </button>
+                                    </div>
+                                    
+                                </div>
+
+                                <hr
+                                    style="
+                                        border-color: var(--border);
+                                        margin: 20px 0;
+                                    "
+                                />
+
+                                <!-- ====== ДОПОЛНИТЕЛЬНЫЙ ЗАРАБОТОК ====== -->
+                                <div class="salary-extra">
+                                    <h3>💰 ДОПОЛНИТЕЛЬНЫЙ ЗАРАБОТОК</h3>
+                                    <p style="color: var(--gray); font-size: 13px; margin-bottom: 10px;">
+                                        Добавьте дополнительное вознаграждение игроку за любое событие.
+                                    </p>
+                                    
+                                    <div class="extra-form">
+                                        <div class="extra-form-row">
+                                            <div class="extra-form-group">
+                                                <label>👤 Игрок</label>
+                                                <select id="extraPlayerSelect" class="form-input">
+                                                    <option value="">Выберите игрока...</option>
+                                                </select>
+                                            </div>
+                                            <div class="extra-form-group">
+                                                <label>📝 Событие</label>
+                                                <input type="text" id="extraEvent" class="form-input" placeholder="Например: Помощь новичкам">
+                                            </div>
+                                            <div class="extra-form-group extra-form-group-small">
+                                                <label>💰 Сумма</label>
+                                                <input type="number" id="extraAmount" class="form-input" placeholder="0">
+                                            </div>
+                                        </div>
+                                        <div class="extra-form-actions">
+                                            <button class="btn-submit btn-extra" id="addExtraBtn">➕ ADD</button>
+                                            <button class="btn-submit btn-extra-clear" id="clearExtraBtn">🗑 CLEAR ALL</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Список дополнительных заработков -->
+                                    <div id="extraList" style="margin-top: 30px;"></div>
+                                </div>
+
+                                <!-- Штрафы -->
+                                <div class="salary-fines">
+                                    <h3>⚖️ ШТРАФЫ</h3>
+                                    <p style="color: var(--gray); font-size: 13px; margin-bottom: 10px;">
+                                        Штраф вычитается из зарплаты участников за текущий период.
+                                    </p>
+                                    
+                                    <!-- Выбор игрока для штрафа -->
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; align-items: center;">
+                                        <label style="color: var(--gray); font-size: 14px; font-weight: 600;">👤 Игрок:</label>
+                                        <select id="finePlayerSelect" class="form-input" style="width: 240px; padding: 8px 12px;">
+                                            <option value="all">Все игроки</option>
+                                        </select>
+                                        <!-- ====== ДОБАВЛЯЕМ ПОДСКАЗКУ ====== -->
+                                        <span id="finePlayerHint" style="color: var(--gray); font-size: 14px;"></span>
+                                    </div>
+                                    
+                                    <div class="fine-form">
+                                        <input type="number" id="fineAmount" class="form-input" placeholder="Сумма штрафа" style="width: 175px;">
+                                        <input type="text" id="fineReason" class="form-input" placeholder="Причина штрафа" style="flex: 1;">
+                                        <button class="btn-submit btn-fine" id="addFineBtn">➕ Add a penalty</button>
+                                        <button class="btn-submit btn-fine" id="clearFinesBtn" style="background: var(--red);">🗑 CLEAR ALL</button>
+                                    </div>
+                                    <div id="finesList" style="margin-top: 30px;"></div>
+                                </div>
+
+                                <hr
+                                    style="
+                                        border-color: var(--border);
+                                        margin: 20px 0;
+                                    "
+                                />
+
+                                <!-- Период -->
+                                <div class="salary-period">
+                                    <label>📅 Период:</label>
+                                    <div class="salary-quick-periods">
+                                        <button
+                                            class="btn-quick active"
+                                            data-days="7"
+                                        >
+                                            Неделя
+                                        </button>
+                                        <button
+                                            class="btn-quick"
+                                            data-days="14"
+                                        >
+                                            2 недели
+                                        </button>
+                                        <button
+                                            class="btn-quick"
+                                            data-days="30"
+                                        >
+                                            Месяц
+                                        </button>
+                                        <button class="btn-quick" data-days="0">
+                                            Свой
+                                        </button>
+                                    </div>
+                                    <input
+                                        type="date"
+                                        id="salaryDateStart"
+                                        class="form-input"
+                                    />
+                                    <span>—</span>
+                                    <input
+                                        type="date"
+                                        id="salaryDateEnd"
+                                        class="form-input"
+                                    />
+                                    <button
+                                        class="btn-submit"
+                                        id="calculateSalaryBtn"
+                                    >
+                                        📊 Calculate
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Результаты (общие для всех) -->
+                            <
+                            <div
+                                id="salaryResults"
+                                style="display: none; margin-top: 20px"
+                            >
+                                <div
+                                    style="
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        flex-wrap: wrap;
+                                        gap: 10px;
+                                        margin-bottom: 15px;
+                                    "
+                                >
+                                    <h3>📊 Результаты</h3>
+                                    <div
+                                        style="
+                                            display: flex;
+                                            gap: 10px;
+                                            flex-wrap: wrap;
+                                            align-items: center;
+                                        "
+                                    >
+                                    </div>
+                                </div>
+                                <div id="salaryTable">
+                                    <!-- ТАБЛИЦА С ОБЕРТКОЙ (СКРОЛЛ ТОЛЬКО ВНУТРИ) -->
+                                    <div class="salary-table-wrapper">
+                                        <div id="salaryTableInner">
+                                            <table>...</table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="salary-total">
+                                    <p>Общая сумма выплат: </p>
+                                        <p id="totalSalarySum">0 Ꝑ</p>
+                                    </div>
+                            </div>
+
+                            <!-- История выплат -->
+                            <div style="margin-top: 35px">
+                                <div
+                                    style="
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        flex-wrap: wrap;
+                                        gap: 10px;
+                                    "
+                                >
+                                    <h3>📜 История выплат</h3>
+                                    <button
+                                        class="btn-submit"
+                                        id="refreshHistoryBtn"
+                                        style="
+                                            padding: 6px 30px;
+                                            font-size: 16px;
+                                        "
+                                    >
+                                        🔄 Update
+                                    </button>
+                                </div>
+
+                                <!-- Фильтр по датам для истории -->
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 15px;
+                                        flex-wrap: wrap;
+                                        margin: 10px 0 15px;
+                                        padding: 10px 15px;
+                                        background: var(--card2);
+                                        border-radius: var(--radius);
+                                        border: 1px solid var(--border);
+                                    "
+                                >
+
+                                    <!-- Выбор игрока (только для лидера) -->
+                                    <!-- Выбор игрока (только для лидера) -->
+                                    <div id="historyPlayerGroup" style="display: none; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                        <label style="color: var(--gray); font-size: 14px; font-weight: 600;">👤 Игрок:</label>
+                                        <select id="historyPlayerSelect" class="form-input" style="width: 220px; padding: 8px 12px; min-width: 180px;">
+                                            <option value="">👥 Все игроки</option>
+                                        </select>
+                                    </div>
+
+                                    <label
+                                        style="
+                                            color: var(--gray);
+                                            font-size: 15px;
+                                            font-weight: 600;
+                                        "
+                                        >📅 Период:</label
+                                    >
+                                    <input
+                                        type="date"
+                                        id="historyDateStart"
+                                        class="form-input"
+                                        style="width: 210px; padding: 6px 10px"
+                                    />
+                                    <span style="color: var(--gray)">—</span>
+                                    <input
+                                        type="date"
+                                        id="historyDateEnd"
+                                        class="form-input"
+                                        style="width: 150px; padding: 6px 10px"
+                                    />
+                                    <button
+                                        class="btn-submit"
+                                        id="applyHistoryFilterBtn"
+                                        style="
+                                            padding: 6px 30px;
+                                            font-size: 16px;
+                                        "
+                                    >
+                                        Apply
+                                    </button>
+                                    <button
+                                        class="btn-submit btn-reset"
+                                        id="resetHistoryFilterBtn"
+                                        style="
+                                            padding: 6px 30px;
+                                            font-size: 16px;
+                                        "
+                                    >
+                                        ↺ Reset
+                                    </button>
+                                </div>
+
+                                <div id="salaryHistory"></div>
+                            </div>
+
+                            <div
+                                id="salaryLoading"
+                                style="
+                                    display: none;
+                                    text-align: center;
+                                    padding: 20px;
+                                    color: rgb(110, 87, 87);
+                                "
+                            >
+                                ⏳ Loading...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================================ -->
+                <!-- ВКЛАДКА: УВЕДОМЛЕНИЯ -->
+                <!-- ============================================================ -->
+                <section class="tab-content" id="tab-notifications" style="display: none;">
+                    <div class="container">
+                        <div class="notifications-container">
+                            <div class="notifications-header">
+                                <h2>🔔 Уведомления</h2>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button class="btn-submit" id="markAllReadBtn" style="padding: 8px 20px;font-size: 16px; background: var(--purple);">Read everything</button>
+                                    <button class="btn-submit" id="clearNotificationsBtn" style="padding: 8px 20px; font-size: 16px; background: var(--red);">Clear all</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Фильтры уведомлений -->
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
+                                <button class="notification-filter chip active" data-filter="all">📋 Все</button>
+                                <button class="notification-filter chip" data-filter="unread">🆕 Новые</button>
+                                <button class="notification-filter chip" data-filter="read">📖 Прочитанные</button>
+                            </div>
+                            
+                            <div id="notificationsList">
+                                <div class="empty-reports">
+                                    <p>📭 Нет уведомлений</p>
+                                    <span>Здесь будут отображаться уведомления о статусе ваших отчетов</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================================ -->
+                <!-- ВКЛАДКА: ОБУЧЕНИЕ -->
+                <!-- ============================================================ -->
+                <section
+                    class="tab-content"
+                    id="tab-academy"
+                    style="display: none"
+                >
+                    <div class="container">
+                        <div class="academy-container">
+                            <!-- ====== ЗАГОЛОВОК ====== -->
+                            <div class="academy-header">
+                                <div class="academy-header-badge">📖</div>
+                                <div class="academy-title-block">
+                                    <h1 class="academy-title">Обучение</h1>
+                                </div>
+
+                                <p class="academy-subtitle">
+                                    Всё, что нужно знать новичку: криминальные
+                                    мероприятия, гайды и полезные видео
+                                </p>
+                            </div>
+
+                            <!-- ====== ВИДЕОМАТЕРИАЛЫ ====== -->
+                            <div class="academy-section">
+                                <div class="academy-section-header">
+                                    <h2>📺 Видеогайды</h2>
+                                    <p>Обучающие видео от опытных игроков</p>
+                                </div>
+                                <!-- ====== ИНСТРУКЦИЯ ПО ПРОСМОТРУ (СКРЫТА) ====== -->
+                                <div class="video-guide-wrapper">
+                                    <button class="instruction-toggle-btn" onclick="toggleInstruction(this)">
+                                        <span class="instruction-toggle-icon">📖</span>
+                                        <span class="instruction-toggle-text">Показать инструкцию по просмотру</span>
+                                        <span class="instruction-toggle-arrow">▼</span>
+                                    </button>
+                                    
+                                    <div class="video-guide-instruction" id="videoGuideInstruction">
+                                        <div class="instruction-header">
+                                            <span class="instruction-icon">🎬</span>
+                                            <h3>Удобный просмотр видеоматериалов</h3>
+                                        </div>
+                                        <p class="instruction-subtitle">Для комфортного просмотра используйте встроенный видеоплеер:</p>
+                                        
+                                        <div class="instruction-grid">
+                                            <div class="instruction-item">
+                                                <div class="instruction-item-icon">▶️</div>
+                                                <div class="instruction-item-content">
+                                                    <h4>Управление воспроизведением</h4>
+                                                    <p>Нажмите на видео для запуска или остановки воспроизведения.</p>
+                                                    <p>Используйте кнопку <strong>⏯</strong> в нижней панели управления.</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="instruction-item">
+                                                <div class="instruction-item-icon">⏩</div>
+                                                <div class="instruction-item-content">
+                                                    <h4>Быстрая перемотка</h4>
+                                                    <p><strong>Двойное нажатие</strong> по левой части видео — перемотка назад на 10 секунд.</p>
+                                                    <p><strong>Двойное нажатие</strong> по правой части видео — перемотка вперёд на 10 секунд.</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="instruction-item">
+                                                <div class="instruction-item-icon">⌨️</div>
+                                                <div class="instruction-item-content">
+                                                    <h4>Управление с клавиатуры (ПК)</h4>
+                                                    <div class="keyboard-shortcuts">
+                                                        <span><kbd>Пробел</kbd> / <kbd>K</kbd> — воспроизведение или пауза</span>
+                                                        <span><kbd>←</kbd> / <kbd>→</kbd> — перемотка на 5 секунд</span>
+                                                        <span><kbd>J</kbd> / <kbd>L</kbd> — перемотка на 10 секунд</span>
+                                                        <span><kbd>↑</kbd> / <kbd>↓</kbd> — регулировка громкости</span>
+                                                        <span><kbd>M</kbd> — включить или отключить звук</span>
+                                                        <span><kbd>F</kbd> — полноэкранный режим</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="instruction-item">
+                                                <div class="instruction-item-icon">📱</div>
+                                                <div class="instruction-item-content">
+                                                    <h4>На мобильных устройствах</h4>
+                                                    <p>Используйте <strong>двойное касание</strong> для быстрой перемотки.</p>
+                                                    <p>Поверните устройство <strong>горизонтально</strong> для просмотра в полноэкранном режиме.</p>
+                                                    <p>Для удобства просмотра рекомендуется использовать Wi-Fi или стабильное интернет-соединение.</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="instruction-item">
+                                                <div class="instruction-item-icon">⚙️</div>
+                                                <div class="instruction-item-content">
+                                                    <h4>Дополнительные возможности</h4>
+                                                    <p>Изменение скорости воспроизведения через меню <strong>⚙️</strong>.</p>
+                                                    <p>Автоматическое качество просмотра зависит от возможностей вашего устройства и браузера.</p>
+                                                    <p>В полноэкранном режиме элементы управления скрываются автоматически для более комфортного просмотра.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="academy-videos">
+                                    <!-- Видео 1: Стрельба -->
+                                    <div class="academy-video-card">
+                                        <div class="academy-video-wrapper">
+                                            <div class="rutube-player" data-rutube="82728341adc32864f768d38993f82081">
+                                                <img src="./img/poster1.jpg" alt="Видеогайд" class="rutube-poster">
+                                                <button class="rutube-play">
+                                                    <svg viewBox="0 0 24 24">
+                                                        <path fill="currentColor" d="M8 5v14l11-7z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="academy-video-info">
+                                            <span class="video-tag"
+                                                >🔫 Стрельба</span
+                                            >
+                                            <h4>Лучший гайд для РП стрельбы</h4>
+                                            <p>
+                                                Обучение стрельбе в GTA CRMP на
+                                                Amazing Online
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Видео 2: Криминал №1 -->
+                                    <div class="academy-video-card">
+                                        <div class="academy-video-wrapper">
+                                            <div class="rutube-player" data-rutube="9ea16be5aba58c9aa642346ef0488221">
+                                                <img src="./img/poster2.jpg" alt="Видеогайд" class="rutube-poster">
+                                                <button class="rutube-play">
+                                                    <svg viewBox="0 0 24 24">
+                                                        <path fill="currentColor" d="M8 5v14l11-7z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="academy-video-info">
+                                            <span class="video-tag"
+                                                >🏴‍☠️ Криминал</span
+                                            >
+                                            <h4>Криминальные мероприятия №1</h4>
+                                            <p>
+                                                Рейд, контейнеры и
+                                                кораблекрушение
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Видео 3: Криминал №2 -->
+                                    <div class="academy-video-card">
+                                        <div class="academy-video-wrapper">
+                                            <div class="rutube-player" data-rutube="b0f6cce8a99e992a22949b10cdb49d96">
+                                                <img src="./img/poster3.jpg" alt="Видеогайд" class="rutube-poster">
+                                                <button class="rutube-play">
+                                                    <svg viewBox="0 0 24 24">
+                                                        <path fill="currentColor" d="M8 5v14l11-7z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="academy-video-info">
+                                            <span class="video-tag"
+                                                >🏴‍☠️ Криминал</span
+                                            >
+                                            <h4>Криминальные мероприятия №2</h4>
+                                            <p>
+                                                Семейное ограбление, цех и
+                                                граффити
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ====== СПРАВОЧНИК МЕРОПРИЯТИЙ ====== -->
+                            <div class="academy-section">
+                                <div class="academy-section-header">
+                                    <h2>⚔️ Криминальные мероприятия</h2>
+                                    <p>
+                                        Полный справочник всех доступных
+                                        активностей
+                                    </p>
+                                </div>
+
+                                <!-- Группа 1: Морские -->
+                                <div class="academy-group">
+                                    <div class="academy-group-label">
+                                        🌊 Морские
+                                    </div>
+                                    <div class="academy-grid">
+                                        <!-- КРУШЕНИЕ КОРАБЛЯ -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                🚢
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Крушение корабля</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag time"
+                                                        >⏰ 20:00</span
+                                                    >
+                                                    <span class="tag require"
+                                                        >🔓 Искусство прежде
+                                                        всего</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong
+                                                            >Как узнать:</strong
+                                                        >
+                                                        Ежедневно в 20:00 сигнал
+                                                        бедствия. Приехать к
+                                                        вышке связи (GPS →
+                                                        Нелегальные структуры →
+                                                        Вышка связи). После
+                                                        получения координат на
+                                                        карте появится иконка
+                                                        «Сигнал SOS».
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Места (4
+                                                            варианта):</strong
+                                                        >
+                                                        Акватория у моста Южный,
+                                                        нефтевышка Батырево,
+                                                        Эдово, нефтевышка
+                                                        Арзамас
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Что нужно:</strong
+                                                        >
+                                                        Купить щипцы у Степана
+                                                        (GPS → Работы → Завод)
+                                                    </p>
+                                                    <p>
+                                                        <strong>Добыча:</strong>
+                                                        3 контейнера с краской +
+                                                        3-7 ящиков с ресурсами
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >⚠️
+                                                            Внимание:</strong
+                                                        >
+                                                        Корабль охраняет военный
+                                                        вертолет — нужно сбить.
+                                                        Конкуренция с другими
+                                                        семьями.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- РЕЙД -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                ⚔️
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Рейд</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag time"
+                                                        >⏰ Каждые 3 часа</span
+                                                    >
+                                                    <span class="tag require"
+                                                        >🔓 Рейды</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong>Время:</strong>
+                                                        9:05, 12:05, 15:05,
+                                                        18:05, 21:05, 00:05,
+                                                        03:05
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Места (4
+                                                            варианта):</strong
+                                                        >
+                                                        Авианосец (Авиа),
+                                                        Новогодний остров
+                                                        (Зимка), вокзал Южный
+                                                        (Южка), ферма (Батка)
+                                                    </p>
+                                                    <p>
+                                                        <strong>Волны:</strong>
+                                                        8 волн. 1-я —
+                                                        уничтожение NPC и захват
+                                                        вышки. 2-я — поиск
+                                                        ключей на платформах
+                                                        (нажмите E). 3-8 —
+                                                        появление 6 бочек с
+                                                        топливом, сложность
+                                                        растет.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Перерывы:</strong
+                                                        >
+                                                        1.5-3 минуты после
+                                                        каждой волны. В начале
+                                                        каждой ударной волны —
+                                                        атака с воздуха.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Награда:</strong
+                                                        >
+                                                        После 8 волн — груз
+                                                        (подбирают 2-4 игрока).
+                                                        При взятии на семью —
+                                                        каждый получает 1
+                                                        ваучер, на склад —
+                                                        патроны, материалы,
+                                                        релаксанты, деньги.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >⚠️ Важно:</strong
+                                                        >
+                                                        Если целостность груза
+                                                        упадет до 0% — он будет
+                                                        испорчен.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Группа 2: Наземные -->
+                                <div class="academy-group">
+                                    <div class="academy-group-label">
+                                        🚂 Наземные
+                                    </div>
+                                    <div class="academy-grid">
+                                        <!-- ЦЕХ -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                🏭
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Цех</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag time"
+                                                        >⏰ Сб/Вс
+                                                        17:00-19:00</span
+                                                    >
+                                                    <span class="tag require"
+                                                        >🔓 Цех</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong>Дни:</strong>
+                                                        Суббота — для семей,
+                                                        Воскресенье — для
+                                                        нелегальных структур
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Как найти:</strong
+                                                        >
+                                                        GPS → Нелегальные
+                                                        структуры → Цех
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Этапы
+                                                            производства:</strong
+                                                        >
+                                                    </p>
+                                                    <ul>
+                                                        <li>
+                                                            Собрать 3 части
+                                                            секретного кода у
+                                                            рабочих в цехе
+                                                        </li>
+                                                        <li>
+                                                            Добыть обогащенное
+                                                            топливо (рейд — 6
+                                                            бочек, или покупка
+                                                            400.000₽, 50% шанс)
+                                                        </li>
+                                                        <li>
+                                                            Сообщить код
+                                                            главному инженеру,
+                                                            выбрать 2 ресурса
+                                                            для производства
+                                                        </li>
+                                                        <li>
+                                                            Подготовка ~2
+                                                            минуты, расход
+                                                            топлива
+                                                        </li>
+                                                    </ul>
+                                                    <p>
+                                                        <strong
+                                                            >Транспорт:</strong
+                                                        >
+                                                        Семьи — Mercedes-Benz
+                                                        Sprinter 2G, GMC
+                                                        Vandura. Организации —
+                                                        только GMC Vandura.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >⚠️
+                                                            Внимание:</strong
+                                                        >
+                                                        Ресурсы сгорают, если не
+                                                        забрать вовремя!
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- КРУШЕНИЕ ВОЕННОГО ПОЕЗДА -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                🚂
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>
+                                                    Крушение военного поезда
+                                                </h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag time"
+                                                        >⏰ 15:30, 19:30,
+                                                        3:30</span
+                                                    >
+                                                    <span class="tag require"
+                                                        >🎯 Для всех</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong>Важно:</strong>
+                                                        Первые 15 минут нельзя
+                                                        подходить — ожоги! После
+                                                        тушения можно проникнуть
+                                                        в поезд.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Места (4
+                                                            варианта):</strong
+                                                        >
+                                                        База дальнобойщиков
+                                                        Арзамас, Лыткарино,
+                                                        вокзал Батырево,
+                                                        Распределительный центр
+                                                    </p>
+                                                    <p>
+                                                        <strong>Добыча:</strong>
+                                                        4 ящика с ресурсами
+                                                    </p>
+                                                    <p>
+                                                        <strong>Захват:</strong>
+                                                        Через 15-20 минут после
+                                                        открытия ящиков — сумки
+                                                        для доставки в точку на
+                                                        карте.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Награда
+                                                            (семьи):</strong
+                                                        >
+                                                        Материалы, патроны,
+                                                        зеленый чай, мятная
+                                                        пудра
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Награда (гос.
+                                                            структуры):</strong
+                                                        >
+                                                        Только материалы
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- СЕМЕЙНОЕ ОГРАБЛЕНИЕ -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                💰
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Семейное ограбление</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag time"
+                                                        >⏰ 18:00 (3 часа)</span
+                                                    >
+                                                    <span class="tag require"
+                                                        >👨‍👩‍👧‍👦 Только семьи</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong>Цель:</strong>
+                                                        Угнать авто → Забрать
+                                                        деньги → Отмыть на Маяке
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Жора
+                                                            Пакетик:</strong
+                                                        >
+                                                        Продает информацию о
+                                                        местоположении авто,
+                                                        кодах, может открыть
+                                                        шлагбаум.
+                                                    </p>
+                                                    <p>
+                                                        <strong>Этап 1:</strong>
+                                                        Найти и зачистить
+                                                        локацию с автомобилем.
+                                                        Найти охранника с
+                                                        запиской (коды для
+                                                        отмыва) и портфель с
+                                                        инструментами.
+                                                    </p>
+                                                    <p>
+                                                        <strong>Этап 2:</strong>
+                                                        Перегнать авто на Южный
+                                                        химический завод. Найти
+                                                        мешки с деньгами,
+                                                        перенести в
+                                                        инкассаторский
+                                                        автомобиль. Завод
+                                                        охраняется наемниками.
+                                                    </p>
+                                                    <p>
+                                                        <strong>Этап 3:</strong>
+                                                        Перегнать грузовик на
+                                                        Маяк (GPS → Районы
+                                                        области → Маяк). Найти
+                                                        Виталия, перенести
+                                                        деньги. Использовать
+                                                        компьютер для отмыва
+                                                        (нужны коды из записки).
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ОГРАБЛЕНИЕ КОНТЕЙНЕРОВ -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                📦
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Ограбление контейнеров</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag time"
+                                                        >⏰ 16:00-19:00</span
+                                                    >
+                                                    <span class="tag require"
+                                                        >🎯 Для всех</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong>Где:</strong>
+                                                        Космодром
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Контейнеры:</strong
+                                                        >
+                                                        1-7 штук, до 16
+                                                        предметов в каждом
+                                                        (деньги, украшения,
+                                                        документы, техника,
+                                                        телефоны, сумки)
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Как
+                                                            открыть:</strong
+                                                        >
+                                                        Отмычки у Степана → 2
+                                                        этапа взлома (при
+                                                        провале прогресс
+                                                        сбрасывается)
+                                                    </p>
+                                                    <p>
+                                                        <strong>Сумки:</strong>
+                                                        Купить у Степана (3
+                                                        предмета на сумку).
+                                                        Складывать в транспорт
+                                                        (до 16 сумок).
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Транспорт:</strong
+                                                        >
+                                                        Mercedes-Benz Sprinter
+                                                        2G, GMC Vandura,
+                                                        Volkswagen Transporter
+                                                        T6
+                                                    </p>
+                                                    <p>
+                                                        <strong>Сдача:</strong>
+                                                        Найти точку скупщика (3
+                                                        варианта с разным
+                                                        курсом) → вызвать
+                                                        вертолет (2 минуты, 16
+                                                        сумок за рейс) → забрать
+                                                        чистые деньги на склад.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Дополнительно:</strong
+                                                        >
+                                                        Сумки можно отобрать у
+                                                        игрока (убив его).
+                                                        Силовые структуры тоже
+                                                        участвуют.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Группа 3: Городские -->
+                                <div class="academy-group">
+                                    <div class="academy-group-label">
+                                        🎨 Городские
+                                    </div>
+                                    <div class="academy-grid">
+                                        <!-- ГРАФФИТИ -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                🎨
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Граффити</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag require"
+                                                        >🔓 Искусство прежде
+                                                        всего</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong>Мест:</strong>
+                                                        50 точек по всей карте
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Типы
+                                                            красок:</strong
+                                                        >
+                                                        ReOMS (зима),
+                                                        SuperGraffiti (лето),
+                                                        317 ink (весна), ost prc
+                                                        (осень), Amazing
+                                                        Graffiti (любой сезон,
+                                                        из рулетки)
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Качество:</strong
+                                                        >
+                                                        Низкое — у Степана (3-5
+                                                        баллончиков). Высокое —
+                                                        в военном поезде, на
+                                                        нефтевышке, в
+                                                        ограблениях, в
+                                                        контейнерах на дне моря
+                                                        (в 20:00, нужны щипцы).
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Как
+                                                            рисовать:</strong
+                                                        >
+                                                        Подойти к месту →
+                                                        Инвентарь (TAB) →
+                                                        баллончик → Использовать
+                                                        → выбрать семью или
+                                                        организацию → распылять
+                                                        с 3 метров до 100%
+                                                        (иногда присесть C).
+                                                    </p>
+                                                    <p>
+                                                        <strong>Бонусы:</strong>
+                                                        Ресурсы с каждого
+                                                        граффити. При 10+
+                                                        граффити — канал с
+                                                        закупщиком (скидки).
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Если
+                                                            занято:</strong
+                                                        >
+                                                        Смыть эмульсией и
+                                                        нанести свое.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ЗАБРОШЕННЫЕ ЯЩИКИ -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                📭
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Заброшенные ящики</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag time"
+                                                        >⏰ 18:00</span
+                                                    >
+                                                    <span class="tag require"
+                                                        >🔓 Ящики с
+                                                        ресурсами</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong
+                                                            >Участники:</strong
+                                                        >
+                                                        Семьи с улучшением
+                                                        «Ящики с ресурсами» или
+                                                        нелегальные организации.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Что нужно:</strong
+                                                        >
+                                                        Лопата (копать), отмычка
+                                                        (взламывать)
+                                                    </p>
+                                                    <p>
+                                                        <strong>Добыча:</strong>
+                                                        Ресурсы, оружие, краска,
+                                                        банковские чеки
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Транспорт:</strong
+                                                        >
+                                                        Mercedes-Benz Sprinter
+                                                        2G, GMC Vandura,
+                                                        Volkswagen Transporter
+                                                        T6
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Доставка:</strong
+                                                        >
+                                                        Донести ящик до метки
+                                                        склада — ресурсы на
+                                                        склад.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >💡 Совет:</strong
+                                                        >
+                                                        Оружие обменять у Матвея
+                                                        на материалы или
+                                                        продать. Банковские чеки
+                                                        тоже нужно обменять,
+                                                        иначе утратят силу.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- СТРЕЛЫ ЗА БИЗНЕС -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                🏢
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Стрелы за бизнес</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag require"
+                                                        >🔓 Стрелы за
+                                                        бизнесы</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong
+                                                            >Кто
+                                                            участвует:</strong
+                                                        >
+                                                        Семьи с улучшением
+                                                        «Стрелы за бизнесы»
+                                                        (магазины 24/7 и аптеки
+                                                        переданы семьям).
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Принятие:</strong
+                                                        >
+                                                        10 минут. Если не успеть
+                                                        — бизнес уходит без боя.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Режим боя:</strong
+                                                        >
+                                                        One Life — без раундов и
+                                                        второй попытки. Оружие,
+                                                        медикаменты и броню
+                                                        готовить самостоятельно.
+                                                        При смерти — нокаут с
+                                                        шансом вернуться.
+                                                    </p>
+                                                    <p>
+                                                        <strong>Бонусы:</strong>
+                                                        1% дохода в первый день,
+                                                        до 5% при долгом
+                                                        удержании.
+                                                    </p>
+                                                    <p>
+                                                        <strong>Важно!</strong>
+                                                        Бизнес приносит доход
+                                                        только если у него есть
+                                                        владелец.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ЗАХВАТ ТЕРРИТОРИЙ -->
+                                        <div class="academy-card">
+                                            <div class="academy-card-icon">
+                                                🗺️
+                                            </div>
+                                            <div class="academy-card-content">
+                                                <h3>Захват территорий</h3>
+                                                <div class="academy-card-tags">
+                                                    <span class="tag time"
+                                                        >⏰ 19:00</span
+                                                    >
+                                                    <span class="tag require"
+                                                        >🔓 Захват
+                                                        территорий</span
+                                                    >
+                                                </div>
+                                                <button
+                                                    class="details-btn"
+                                                    onclick="
+                                                        toggleDetails(this)
+                                                    "
+                                                >
+                                                    <span class="arrow">▶</span>
+                                                    Подробнее
+                                                </button>
+                                                <div
+                                                    class="academy-card-details"
+                                                >
+                                                    <p>
+                                                        <strong
+                                                            >Участники:</strong
+                                                        >
+                                                        Семьи с улучшением и
+                                                        ППС/ФСБ (на рабочем
+                                                        дне).
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Территории
+                                                            (случайно):</strong
+                                                        >
+                                                        Казино, Порт, Склад,
+                                                        Телевышка
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Длительность:</strong
+                                                        >
+                                                        максимум 1 час.
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Механика:</strong
+                                                        >
+                                                        5 минут на точке —
+                                                        первичный захват. 10
+                                                        минут удержания —
+                                                        закрепление. 3 минуты на
+                                                        точке — перебить захват
+                                                        (территория становится
+                                                        нейтральной).
+                                                    </p>
+                                                    <p>
+                                                        <strong
+                                                            >Особые
+                                                            условия:</strong
+                                                        >
+                                                        На казино и порте
+                                                        отключается зеленая
+                                                        зона. Не выдается
+                                                        розыск. После смерти от
+                                                        гос. структур — не в
+                                                        КПЗ. Работает Анти-RVK.
+                                                    </p>
+                                                    <p>
+                                                        <strong>Бонусы:</strong>
+                                                        Казино — +200.000₽/час
+                                                        или +20% к зарплате.
+                                                        Порт — Адреналин-S и
+                                                        аптечки. Склад — 1.500
+                                                        материалов/час.
+                                                        Телевышка — информация о
+                                                        рейдах и игроках (для
+                                                        гос. — ускоренный
+                                                        пробив).
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- СТРАНИЦА СБРОСА ПАРОЛЯ -->
+        <div
+            id="resetPasswordPage"
+            style="
+                display: none;
+                padding: 60px 0;
+                min-height: 80vh;
+                display: none;
+            "
+        >
+            <div class="container">
+                <div
+                    class="add-report-form"
+                    style="max-width: 500px; margin: 0 auto"
+                >
+                    <h2 class="form-title">🔑 ВОССТАНОВЛЕНИЕ ПАРОЛЯ</h2>
+                    <p
+                        style="
+                            color: var(--gray);
+                            text-align: center;
+                            margin-bottom: 25px;
+                        "
+                    >
+                        Введите новый пароль для вашего аккаунта
+                    </p>
+
+                    <div
+                        id="resetStatus"
+                        style="
+                            text-align: center;
+                            padding: 15px;
+                            background: var(--card2);
+                            border-radius: 10px;
+                            margin-bottom: 20px;
+                            color: var(--gray);
+                        "
+                    >
+                        ⏳ Проверка ссылки...
+                    </div>
+
+                    <form id="resetPasswordForm">
+                        <div class="form-group">
+                            <label for="resetNewPassword">Новый пароль</label>
+                            <input
+                                type="password"
+                                id="resetNewPassword"
+                                class="form-input"
+                                placeholder="Минимум 6 символов"
+                                required
+                                minlength="6"
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label for="resetConfirmPassword"
+                                >Подтвердите пароль</label
+                            >
+                            <input
+                                type="password"
+                                id="resetConfirmPassword"
+                                class="form-input"
+                                placeholder="Повторите новый пароль"
+                                required
+                                minlength="6"
+                            />
+                        </div>
+                        <div
+                            id="resetMessage"
+                            style="
+                                text-align: center;
+                                margin: 10px 0;
+                                font-size: 14px;
+                            "
+                        ></div>
+                        <div
+                            class="form-buttons"
+                            style="justify-content: center"
+                        >
+                            <button
+                                type="submit"
+                                class="btn-submit"
+                                id="resetSubmitBtn"
+                            >
+                                СМЕНИТЬ ПАРОЛЬ
+                            </button>
+                        </div>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 20px">
+                        <a
+                            href="https://wockhardtmandem.onrender.com"
+                            style="color: var(--purple); text-decoration: none"
+                            >← Вернуться на главную</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для просмотра изображений -->
+        <div class="overlay" id="globalOverlay">
+            <img class="fullImage" id="globalFullImage" src="" alt="" />
+            <button class="close-overlay" id="closeOverlay">✕</button>
+            <div class="image-nav">
+                <button class="nav-btn" id="prevImage">‹</button>
+                <span class="image-counter" id="imageCounter">1 / 1</span>
+                <button class="nav-btn" id="nextImage">›</button>
+            </div>
+        </div>
+
+        <!-- Подключение Appwrite SDK -->
+        <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+        </script>
+        <script src="./js/plyr-premium.js"></script>
+        <script type="module" src="./js/config.js"></script>
+        <script type="module" src="./js/app.js"></script>
+        <script type="module" src="./js/theme.js"></script>
+    </body>
+</html>

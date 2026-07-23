@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: wockhardt-reports
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: APPWRITE_ENDPOINT
+        sync: false
+      - key: APPWRITE_PROJECT_ID
+        sync: false
+      - key: APPWRITE_SERVER_KEY
+        sync: false
+      - key: APPWRITE_DATABASE_ID
+        sync: false
+      - key: APPWRITE_USERS_COLLECTION
+        value: users
+      - key: APPWRITE_REPORTS_COLLECTION
+        value: reports
+      - key: APPWRITE_BUCKET_ID
+        value: report-images
